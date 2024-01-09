@@ -1,0 +1,247 @@
+<!DOCTYPE html><html><head><title>Watch</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<div class="container main my-5"><div class="row"><main class="col post">
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Watch</h1><small>檔名：<code>options-watch.html</code></small></div>
+<!-- 🔥🔥練習開始🔥🔥 -->
+
+<div id="app">
+
+  <h3>watch 監聽單一變數</h3>
+  <p>watch會去監聽data中單一個值，當值有變化時會觸發一些事件，觸發的事件就像methods一樣可以進行一些複雜的運算，像是我們要改變data裡面的值，或是要重新取得遠端的資料都是可以的</p>
+  <p>watch 不會產生一個新的值而是去修改data的內容，當data有變化時再重新渲染到畫面上</p>
+  <label for="name">名字須超過十個字</label>
+  <h3>習題一：</h3>
+  <ul>
+    <li>當要監聽這個變數時，直接將變數名稱取做fu的名稱</li>
+    <li>函式中帶入兩個參數，一個是新的值，一個是舊的值</li>
+    <li>一開始值沒有任何變動因此不會觸發watch</li>
+  </ul>
+  <input type="text" id="name" v-model="tempName">
+  <P>result: {{ result }}</P>
+  <p>name: {{ name }}</p>
+
+  <h3>watch vs computed</h3>
+  <h5>Watch</h5>
+  <ul>
+    <li>監聽單一 “變數” 觸發事件 (ex.tempName)，使用函式再watch中撰寫</li>
+    <li>該函式可同時操作多個變數 (ex.result and name)</li>
+    <li>一開始值沒有任何變動，不會觸發watch</li>
+    <li>當值是一個物件時，才有辦法監聽多個變數，並且使用物件再watch中撰寫，固定結構是handler函式(n,o)、deep為true(深層監聽)</li>
+  </ul>
+
+  <h5>Computed (getter的部分)</h5>
+  <ul>
+    <li>監聽多個變數觸發事件</li>
+    <li>會產生一個值</li>
+  </ul>
+
+  <label for="productName">商品名稱</label><input type="text" v-model="productName"><br>
+  <label for="productPrice">商品價格</label><input type="number" v-model.number="productPrice"><br>
+  <label><input type="checkbox"  v-model="productVegan"> 素食</label>
+  <p>Computed result2: {{ result2 }}</p>
+  <p>Watch result3: {{ result3 }}</p>
+
+  <h3>watch 深層監聽</h3>
+  <label for="productName">商品名稱</label><input type="text" v-model="product.name"><br>
+  <label for="productPrice">商品價格</label><input type="number" v-model.number="product.price"><br>
+  <label><input type="checkbox"  v-model="product.vegan"> 素食</label>
+  <p>result4: {{ result4 }}</p>
+
+</div>
+
+<script>
+const App = {
+  data() {
+    return {
+      name: '',
+      tempName: '',
+      result: '',
+      result3: '',
+      result4: '',
+      // 單一產品
+      productName: '蛋餅',
+      productPrice: 30,
+      productVegan: false,
+      // 單一產品
+      product: {
+        name: '蛋餅',
+        price: 30,
+        vegan: false
+      },
+      products: [
+        {
+          name: '蛋餅',
+          price: 30,
+          vegan: false
+        },
+        {
+          name: '飯糰',
+          price: 35,
+          vegan: false
+        },
+        {
+          name: '小籠包',
+          price: 60,
+          vegan: false
+        },
+        {
+          name: '蘿蔔糕',
+          price: 30,
+          vegan: true
+        },
+      ],
+      carts: [],
+      sum: 0,
+    }
+  },
+  computed: {
+    result2() {
+      // 在此監聽了productName/productPrice/productVegan
+      return `媽媽買了 ${this.productName}，總共花費 ${this.productPrice} 元，另外這 ${this.productVegan ? '是' : '不是'} 素食的`;
+    }
+  },
+  watch: {
+    tempName(newVal, oldVal){
+      console.log(newVal, oldVal);
+      if(newVal.length>=10){
+        this.result = `文字長度為 ${newVal.length} 個字，將儲存至變數中`;
+        this.name = newVal;
+      }else{
+        this.result = `輸入的文字僅有 ${newVal.length} 個字，上一次有 ${oldVal.length} 個字`;
+      }
+    },
+    // 單一變數操作
+    productName(){
+      this.result3 = `媽媽買了 ${this.productName}，總共花費 ${this.productPrice} 元，另外這 ${this.productVegan ? '是' : '不是'} 素食的`
+    },
+    productPrice(){
+      this.result3 = `媽媽買了 ${this.productName}，總共花費 ${this.productPrice} 元，另外這 ${this.productVegan ? '是' : '不是'} 素食的`
+    },
+    productVegan(){
+      this.result3 = `媽媽買了 ${this.productName}，總共花費 ${this.productPrice} 元，另外這 ${this.productVegan ? '是' : '不是'} 素食的`
+    },
+    // 物件變數操作
+    product:{
+      // 在 handler 函式中，newVal 代表新的物件值，oldVal 代表舊的物件值。然而，由於JavaScript中物件是引用類型，newVal 和 oldVal 都指向相同的物件實例。即使物件內部的屬性有變化，這兩者仍然指向相同的物件。
+      //因此，雖然你可能修改了 product 內部的屬性，但 newVal 和 oldVal 都指向同一個物件實例，所以在 handler 中看到的結果是相同的。
+      handler(newVal, oldVal){
+        this.result4 = `媽媽買了 ${this.product.name}，總共花費 ${this.product.price} 元，另外這 ${this.product.vegan ? '是' : '不是'} 素食的`
+      },
+      deep: true,
+    },
+  }
+  // 保留文字：
+  // `文字長度為 ${n.length} 個字，將儲存至變數中`
+  // `輸入的文字僅有 ${n.length} 個字，上一次有 ${o.length} 個字`
+  // `媽媽買了 ${this.productName}，總共花費 ${this.productPrice} 元，另外這 ${this.productVegan? '是' : '不是'} 素食的`
+
+};
+Vue.createApp(App).mount('#app');
+</script>
+
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+    <aside
+      class="col-md-3"><div class="sticky-top" style="top: 76px">
+  <div class="list-group">
+  
+    <a href="/optionsApi/options-api.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      option API
+    </a>
+  
+    <a href="/optionsApi/options-methods.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Methods
+    </a>
+  
+    <a href="/optionsApi/options-computed.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Computed
+    </a>
+  
+    <a href="/optionsApi/options-watch.html"
+      class="list-group-item list-group-item-action
+        
+        active">
+      Watch
+    </a>
+  
+    <a href="/optionsApi/options-life-cycle.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件生命週期
+    </a>
+  
+    <a href="/optionsApi/options-final.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      章節挑戰
+    </a>
+  
+  </div>
+  <div class="mt-3 text-end p-2 bg-light rounded">
+    <small class="text-black-50 fw-light mb-0">文件版本：2022/11/1</small>
+  </div>
+</div>
+
+</aside>
+    
+  </div>
+</div>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vue 3 練習手冊</a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link " href="/es6/shorthand.html">JS 必備觀念</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/intro/createApp.html">認識 Vue.js</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/template/v-text.html">模板</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/optionsApi/options-methods.html">方法</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/components/component_register.html">元件</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/advApi/adv-refs.html">進階</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/router/vue-router.html">路由</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/composition/proxy.html">Composition API</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/pinia/layout.html">Pinia</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<footer class="footer py-2 bg-light">
+  <div class="container text-center">
+    <small class="text-black-50 fw-light mb-0">六角學院 Vue 課程專屬文件</small>
+  </div>
+</footer>
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>

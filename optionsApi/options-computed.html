@@ -1,0 +1,232 @@
+<!DOCTYPE html><html><head><title>Computed</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<div class="container main my-5"><div class="row"><main class="col post">
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Computed</h1><small>檔名：<code>options-computed.html</code></small></div>
+<!-- 🔥🔥練習開始🔥🔥 -->
+
+<div id="app">
+
+  <h3>Computed 將目前的數值運算呈現至畫面上</h3>
+  <p>其他幾個方法都可以直接操作資料內容，而Computed大部分則是將資料讀取出來，重新運算出一個結果之後，再把結果呈現在畫面上，因此他大部分是只讀不寫</p>
+  <ul>
+    <li v-for="product in products">
+      {{ product.name }} / {{ product.price }}
+      <button type="button" @click="addToCart(product)">加入購物車</button>
+    </li>
+  </ul>
+  ...
+  <h6>購物車項目</h6>
+  <ul>
+    <li v-for="item in carts">{{ item.name }}</li>
+  </ul>
+  <h3>習題一：Getter</h3>
+  <p>當carts變動時，會觸發computed裡面total的函式運行，更新後回傳結果至畫面上</p>
+  total 的值：{{ total }}<br>
+
+  <h3>Computed 常見技巧 - 搜尋</h3>
+  <h3>習題二：</h3>
+  <input type="search" v-model="search">
+  <ul>
+    <li v-for="item in filterProducts">
+      {{ item.name }} / {{ item.price }}
+    </li>
+  </ul>
+
+  <h3>Computed Getter, Setter</h3>
+  <h3>習題三：Setter</h3>
+  <p>將資料調整後再寫入資料裡面，假設透過methods對computed進行觸發，就會寫入一筆資料到computed裡面，而computed會重新調整資料內容後，寫入data裡面，與Getter的概念相反</p>
+  <p>如果要拆分成Getter, Setter，須將原本的computed物件底下函式的寫法改掉，改成物件寫法裡面寫get函式，內容則是原本函式的內容</p>
+  <p>Getter, Setter的值會分開運算</p>
+  sum 的值：
+  <input type="number" v-model.number="num">
+  <button type="button" @click="total = num">更新</button>
+  total 的值：{{ total }}<br>
+  sum 的值：{{ sum }}
+  <h4>Q1：不太懂為何set(val)跟@click="total = num"有關係？</h4>
+  <p>當你在模板中使用 @click="total = num" 時，它實際上是在觸發 total 的 setter。在你的 Vue 實例中，total 是一個 computed property，它有一個 getter 和一個 setter。
+  <br>
+  在這個情境中，當你點擊按鈕並將 num 的值賦給 total 時，這會觸發 total 的 setter，而 setter 中的內容是將傳入的值 val 賦給 sum。因此，sum 的值會更新為 num。
+  <br>
+  這樣的設計是為了讓你可以透過使用者的互動（點擊按鈕）更新計算屬性的值，同時也將這個值存儲在其他的 data 屬性中（這裡是 sum）。
+  <br>
+  簡而言之，@click="total = num" 這段程式碼是在透過點擊按鈕來更新 total 的值，這個行為會觸發 total 的 setter，而 setter 中的邏輯將新的值賦給了 sum。</p>
+  <h4>Q2：請問為何set(val)的val是num</h4>
+  <p>
+    在Vue的computed property中，如果你使用了setter，那麼setter的參數（這裡是val）會被設定為你試圖將computed property設定為的新值。換句話說，當你寫入computed
+    property時，setter會接收到你嘗試設定的新值。
+    <br>
+    在你的程式碼中，total 是一個computed property，並且你設定了setter：
+    <br>
+    當你使用 @click="total = num" 時，這會將total的值設定為num，這個新的值 num 就是被傳入 set(val) 中的 val。所以，在這個情境下，val 就是
+    num。這樣的設計讓你可以在setter中根據嘗試寫入computed property的新值做一些邏輯處理，這裡的邏輯是將新值賦給 sum。
+  </p>
+</div>
+
+<script>
+const App = {
+  data() {
+    return {
+      num: 10,
+      search: '',
+      products: [
+        {
+          name: '蛋餅',
+          price: 30,
+          vegan: false
+        },
+        {
+          name: '飯糰',
+          price: 35,
+          vegan: false
+        },
+        {
+          name: '小籠包',
+          price: 60,
+          vegan: false
+        },
+        {
+          name: '蘿蔔糕',
+          price: 30,
+          vegan: true
+        },
+      ],
+      carts: [],
+      sum: 0,
+    }
+  },
+  computed: {
+    total:{
+      get(){// ... getter 的邏輯
+        let total = 0;
+        this.carts.forEach(item=>{
+          total += item.price;
+        });
+        return this.sum || total;
+      },
+      set(val){ // 寫入 // setter 的邏輯
+        this.sum = val;
+      }
+    },
+    filterProducts(){
+      return this.products.filter(item=>{
+        return item.name.match(this.search);
+      })
+    },
+  },
+  methods: {
+    addToCart(product) {
+      this.carts.push(product)
+    },
+  },
+  created() {
+    console.log(this);
+  }
+};
+Vue.createApp(App).mount('#app');
+</script>
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+    <aside
+      class="col-md-3"><div class="sticky-top" style="top: 76px">
+  <div class="list-group">
+  
+    <a href="/optionsApi/options-api.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      option API
+    </a>
+  
+    <a href="/optionsApi/options-methods.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Methods
+    </a>
+  
+    <a href="/optionsApi/options-computed.html"
+      class="list-group-item list-group-item-action
+        
+        active">
+      Computed
+    </a>
+  
+    <a href="/optionsApi/options-watch.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Watch
+    </a>
+  
+    <a href="/optionsApi/options-life-cycle.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件生命週期
+    </a>
+  
+    <a href="/optionsApi/options-final.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      章節挑戰
+    </a>
+  
+  </div>
+  <div class="mt-3 text-end p-2 bg-light rounded">
+    <small class="text-black-50 fw-light mb-0">文件版本：2022/11/1</small>
+  </div>
+</div>
+
+</aside>
+    
+  </div>
+</div>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vue 3 練習手冊</a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link " href="/es6/shorthand.html">JS 必備觀念</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/intro/createApp.html">認識 Vue.js</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/template/v-text.html">模板</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/optionsApi/options-methods.html">方法</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/components/component_register.html">元件</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/advApi/adv-refs.html">進階</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/router/vue-router.html">路由</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/composition/proxy.html">Composition API</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/pinia/layout.html">Pinia</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<footer class="footer py-2 bg-light">
+  <div class="container text-center">
+    <small class="text-black-50 fw-light mb-0">六角學院 Vue 課程專屬文件</small>
+  </div>
+</footer>
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>

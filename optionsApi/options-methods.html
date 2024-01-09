@@ -1,0 +1,233 @@
+<!DOCTYPE html><html><head><title>Methods</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<div class="container main my-5"><div class="row"><main class="col post">
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Methods</h1><small>檔名：<code>options-methods.html</code></small></div>
+<!-- 🔥🔥練習開始🔥🔥 -->
+
+<div id="app">
+
+  <h3>methods 的結構</h3>
+  <ul>
+    <li>由 methods 定義的物件</li>
+    <li>內層均是函式</li>
+  </ul>
+  
+  <h3>methods 的觸發方法（點擊、其它 options api、生命週期...）</h3>
+  <p>1.點擊觸發methods的方法</p>
+  <button type="button" @click="trigger('Click Methods')">點擊觸發</button>
+  <p>2.由 methods 中的另一個方法觸發</p>
+  <button type="button" @click="callOtherMethod">呼叫另一個 methods</button>
+  <p>3. 由created觸發</p>
+  <h3>參數傳入</h3>
+  <p>1.沒有任何參數傳入，預設undefined</p>
+  <p>2.傳時事件使用 $event，傳入時事件可自定義名稱</p>
+  <button type="button" @click="methodParameter(1,2,3,$event)">參數傳入</button>
+
+  <h3>使用 methods 處理複雜資料</h3>
+  <p>實戰常用技巧</p>
+  <ul>
+    <li v-for="product in products">
+      {{ product.name }} / {{ product.price }}
+      <button type="button" @click="addToCart(product)">加入購物車</button>
+    </li>
+  </ul>
+  ...
+  <h6>購物車項目</h6>
+  <ul>
+    <li v-for="item in carts">{{ item.name }}</li>
+  </ul>
+  總金額 {{ sum }}
+
+
+  <h3>作為 $filter 使用（取代複雜表達式）</h3>
+  <p>反覆出現、複雜的運算，使用methods來封裝</p>
+  <p>{{ convertToAmount(sum) }}</p>
+  <p>vue2留下來的縮法，vue3已經移除，使用methods取代</p>
+
+</div>
+
+<script>
+const App = {
+  data() {
+    return {
+      num: 10,
+      products: [
+        {
+          name: '蛋餅',
+          price: 30,
+          vegan: false
+        },
+        {
+          name: '飯糰',
+          price: 35,
+          vegan: false
+        },
+        {
+          name: '小籠包',
+          price: 60,
+          vegan: false
+        },
+        {
+          name: '蘿蔔糕',
+          price: 30,
+          vegan: true
+        },
+      ],
+      carts: [],
+      sum: 0,
+    }
+  },
+  methods: {
+    trigger(name) {
+      console.log(name, '此事件被觸發了')
+    },
+    callOtherMethod() {
+      this.trigger('callOtherMethod')
+      // this.trigger('由 callOtherMethod 觸發')
+    },
+    methodParameter(a, b, c, d) {
+      console.log(a, b, c, d)
+    },
+    addToCart(product){
+      console.log('addToCart', product);
+      this.carts.push(product);
+      this.calculate();
+    },
+    calculate(){
+      console.log('calculate');
+      let total = 0;
+      this.carts.forEach(function(el){
+        console.log(el.price);
+        total += el.price;
+      })
+      this.sum = total;
+    },
+    convertToAmount(price){
+      return `NT${price}`;
+    }
+    // addToCart(product) {
+    //   this.carts.push(product)
+    // },
+    // calculate() {
+    //   let total = 0;
+    //   this.carts.forEach(item => {
+    //     total += item.price;
+    //   });
+    //   this.sum = total;
+    // },
+    // convertToAmount(price) {
+    //   return `NT$ ${price}`;
+    // }
+  },
+  created() {
+    this.trigger('由生命週期觸發');
+  }
+};
+Vue.createApp(App).mount('#app');
+</script>
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+    <aside
+      class="col-md-3"><div class="sticky-top" style="top: 76px">
+  <div class="list-group">
+  
+    <a href="/optionsApi/options-api.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      option API
+    </a>
+  
+    <a href="/optionsApi/options-methods.html"
+      class="list-group-item list-group-item-action
+        
+        active">
+      Methods
+    </a>
+  
+    <a href="/optionsApi/options-computed.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Computed
+    </a>
+  
+    <a href="/optionsApi/options-watch.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Watch
+    </a>
+  
+    <a href="/optionsApi/options-life-cycle.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件生命週期
+    </a>
+  
+    <a href="/optionsApi/options-final.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      章節挑戰
+    </a>
+  
+  </div>
+  <div class="mt-3 text-end p-2 bg-light rounded">
+    <small class="text-black-50 fw-light mb-0">文件版本：2022/11/1</small>
+  </div>
+</div>
+
+</aside>
+    
+  </div>
+</div>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vue 3 練習手冊</a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link " href="/es6/shorthand.html">JS 必備觀念</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/intro/createApp.html">認識 Vue.js</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/template/v-text.html">模板</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/optionsApi/options-methods.html">方法</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/components/component_register.html">元件</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/advApi/adv-refs.html">進階</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/router/vue-router.html">路由</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/composition/proxy.html">Composition API</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/pinia/layout.html">Pinia</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<footer class="footer py-2 bg-light">
+  <div class="container text-center">
+    <small class="text-black-50 fw-light mb-0">六角學院 Vue 課程專屬文件</small>
+  </div>
+</footer>
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>
